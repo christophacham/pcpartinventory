@@ -4,9 +4,9 @@ use sqlx::PgPool;
 use dotenv::dotenv;
 use std::env;
 
-mod models;
-mod handlers;
-mod db;
+pub mod models;
+pub mod handlers;
+pub mod db;
 
 use handlers::{pc_handlers, inventory_handlers, buyer_handlers, report_handlers};
 
