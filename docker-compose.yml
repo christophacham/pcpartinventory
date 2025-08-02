@@ -1,0 +1,91 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: pc-inventory-postgres
+    environment:
+      POSTGRES_DB: pc_inventory
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  redis:
+    image: redis:7-alpine
+    container_name: pc-inventory-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  backend:
+    build: 
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: pc-inventory-backend
+    environment:
+      DATABASE_URL: postgresql://postgres:password@postgres:5432/pc_inventory
+      RUST_LOG: debug
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./src:/app/src
+      - ./Cargo.toml:/app/Cargo.toml
+      - ./migrations:/app/migrations
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: pc-inventory-frontend
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8080
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+
+  dapr-sidecar:
+    image: daprio/daprd:1.12.0
+    container_name: pc-inventory-dapr
+    command: [
+      "./daprd",
+      "-app-id", "pc-inventory-backend",
+      "-app-port", "8080",
+      "-dapr-http-port", "3500",
+      "-dapr-grpc-port", "50001",
+      "-components-path", "/components"
+    ]
+    depends_on:
+      - redis
+      - backend
+    ports:
+      - "3500:3500"
+      - "50001:50001"
+    volumes:
+      - ./dapr-components:/components
+    network_mode: "service:backend"
+
+volumes:
+  postgres_data:
+  redis_data:
