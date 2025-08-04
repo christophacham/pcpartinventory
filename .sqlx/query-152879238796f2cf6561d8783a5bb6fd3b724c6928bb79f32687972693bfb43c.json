@@ -1,0 +1,76 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT \n            id, component_type, component_name, buy_in_price, typical_sell_price,\n            quantity_available as \"quantity_available!\", notes, purchase_link, \n            created_at as \"created_at!\", \n            updated_at as \"updated_at!\"\n        FROM parts_inventory \n        WHERE quantity_available <= $1\n        ORDER BY quantity_available ASC, component_type, component_name\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "component_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "component_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "buy_in_price",
+        "type_info": "Numeric"
+      },
+      {
+        "ordinal": 4,
+        "name": "typical_sell_price",
+        "type_info": "Numeric"
+      },
+      {
+        "ordinal": 5,
+        "name": "quantity_available!",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 6,
+        "name": "notes",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 7,
+        "name": "purchase_link",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 8,
+        "name": "created_at!",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 9,
+        "name": "updated_at!",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "152879238796f2cf6561d8783a5bb6fd3b724c6928bb79f32687972693bfb43c"
+}

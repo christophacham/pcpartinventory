@@ -10,7 +10,9 @@ pub async fn get_all_parts(pool: &PgPool) -> Result<Vec<InventoryPart>> {
         r#"
         SELECT 
             id, component_type, component_name, buy_in_price, typical_sell_price,
-            quantity_available, notes, purchase_link, created_at, updated_at
+            quantity_available as "quantity_available!", notes, purchase_link, 
+            created_at as "created_at!", 
+            updated_at as "updated_at!"
         FROM parts_inventory 
         ORDER BY component_type, component_name
         "#
@@ -32,7 +34,9 @@ pub async fn create_part(pool: &PgPool, request: CreateInventoryPartRequest) -> 
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
         RETURNING 
             id, component_type, component_name, buy_in_price, typical_sell_price,
-            quantity_available, notes, purchase_link, created_at, updated_at
+            quantity_available as "quantity_available!", notes, purchase_link, 
+            created_at as "created_at!", 
+            updated_at as "updated_at!"
         "#,
         Uuid::new_v4(),
         request.component_type,
@@ -64,7 +68,9 @@ pub async fn update_part(pool: &PgPool, part_id: Uuid, request: UpdateInventoryP
         WHERE id = $1
         RETURNING 
             id, component_type, component_name, buy_in_price, typical_sell_price,
-            quantity_available, notes, purchase_link, created_at, updated_at
+            quantity_available as "quantity_available!", notes, purchase_link, 
+            created_at as "created_at!", 
+            updated_at as "updated_at!"
         "#,
         part_id,
         request.component_name,
@@ -86,7 +92,9 @@ pub async fn get_low_stock_parts(pool: &PgPool, threshold: i32) -> Result<Vec<In
         r#"
         SELECT 
             id, component_type, component_name, buy_in_price, typical_sell_price,
-            quantity_available, notes, purchase_link, created_at, updated_at
+            quantity_available as "quantity_available!", notes, purchase_link, 
+            created_at as "created_at!", 
+            updated_at as "updated_at!"
         FROM parts_inventory 
         WHERE quantity_available <= $1
         ORDER BY quantity_available ASC, component_type, component_name

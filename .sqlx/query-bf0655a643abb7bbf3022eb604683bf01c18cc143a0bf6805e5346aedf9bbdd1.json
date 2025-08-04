@@ -1,0 +1,83 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        INSERT INTO parts_inventory (\n            id, component_type, component_name, buy_in_price, typical_sell_price,\n            quantity_available, notes, purchase_link\n        )\n        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)\n        RETURNING \n            id, component_type, component_name, buy_in_price, typical_sell_price,\n            quantity_available as \"quantity_available!\", notes, purchase_link, \n            created_at as \"created_at!\", \n            updated_at as \"updated_at!\"\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "component_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "component_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "buy_in_price",
+        "type_info": "Numeric"
+      },
+      {
+        "ordinal": 4,
+        "name": "typical_sell_price",
+        "type_info": "Numeric"
+      },
+      {
+        "ordinal": 5,
+        "name": "quantity_available!",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 6,
+        "name": "notes",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 7,
+        "name": "purchase_link",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 8,
+        "name": "created_at!",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 9,
+        "name": "updated_at!",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Varchar",
+        "Varchar",
+        "Numeric",
+        "Numeric",
+        "Int4",
+        "Text",
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "bf0655a643abb7bbf3022eb604683bf01c18cc143a0bf6805e5346aedf9bbdd1"
+}

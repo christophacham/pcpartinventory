@@ -1,0 +1,70 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT \n                id, pc_id, component_name, cost, notes,\n                component_type as \"component_type: crate::models::ComponentType\"\n            FROM pc_components \n            WHERE pc_id = $1\n            ORDER BY component_type\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "pc_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "component_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "cost",
+        "type_info": "Numeric"
+      },
+      {
+        "ordinal": 4,
+        "name": "notes",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "component_type: crate::models::ComponentType",
+        "type_info": {
+          "Custom": {
+            "name": "component_type",
+            "kind": {
+              "Enum": [
+                "cpu",
+                "gpu",
+                "motherboard",
+                "ram",
+                "storage1",
+                "storage2",
+                "psu",
+                "case",
+                "cpu_cooler",
+                "additional"
+              ]
+            }
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true,
+      false
+    ]
+  },
+  "hash": "ce3dd5314ec266e96eab8aa3d0dcb1cd3c3c214e7609f292a4ba7c454837e8e6"
+}

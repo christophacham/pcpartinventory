@@ -3,10 +3,10 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::models::{InventoryPart, CreateInventoryPartRequest, UpdateInventoryPartRequest};
-use crate::db::inventory_queries;
+use crate::db;
 
 pub async fn list_parts(pool: web::Data<PgPool>) -> Result<HttpResponse> {
-    match inventory_queries::get_all_parts(&pool).await {
+    match db::get_all_parts(&pool).await {
         Ok(parts) => Ok(HttpResponse::Ok().json(parts)),
         Err(e) => {
             eprintln!("Error fetching parts: {}", e);
@@ -21,7 +21,7 @@ pub async fn create_part(
     request: web::Json<CreateInventoryPartRequest>,
     pool: web::Data<PgPool>
 ) -> Result<HttpResponse> {
-    match inventory_queries::create_part(&pool, request.into_inner()).await {
+    match db::create_part(&pool, request.into_inner()).await {
         Ok(part) => Ok(HttpResponse::Created().json(part)),
         Err(e) => {
             eprintln!("Error creating part: {}", e);
@@ -39,7 +39,7 @@ pub async fn update_part(
 ) -> Result<HttpResponse> {
     let part_id = path.into_inner();
     
-    match inventory_queries::update_part(&pool, part_id, request.into_inner()).await {
+    match db::update_part(&pool, part_id, request.into_inner()).await {
         Ok(Some(part)) => Ok(HttpResponse::Ok().json(part)),
         Ok(None) => Ok(HttpResponse::NotFound().json(serde_json::json!({
             "error": "Part not found"
@@ -54,7 +54,7 @@ pub async fn update_part(
 }
 
 pub async fn low_stock(pool: web::Data<PgPool>) -> Result<HttpResponse> {
-    match inventory_queries::get_low_stock_parts(&pool, 5).await {
+    match db::get_low_stock_parts(&pool, 5).await {
         Ok(parts) => Ok(HttpResponse::Ok().json(parts)),
         Err(e) => {
             eprintln!("Error fetching low stock parts: {}", e);

@@ -3,10 +3,10 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::models::{Buyer, CreateBuyerRequest};
-use crate::db::buyer_queries;
+use crate::db;
 
 pub async fn list_buyers(pool: web::Data<PgPool>) -> Result<HttpResponse> {
-    match buyer_queries::get_all_buyers(&pool).await {
+    match db::get_all_buyers(&pool).await {
         Ok(buyers) => Ok(HttpResponse::Ok().json(buyers)),
         Err(e) => {
             eprintln!("Error fetching buyers: {}", e);
@@ -21,7 +21,7 @@ pub async fn create_buyer(
     request: web::Json<CreateBuyerRequest>,
     pool: web::Data<PgPool>
 ) -> Result<HttpResponse> {
-    match buyer_queries::create_buyer(&pool, request.into_inner()).await {
+    match db::create_buyer(&pool, request.into_inner()).await {
         Ok(buyer) => Ok(HttpResponse::Created().json(buyer)),
         Err(e) => {
             eprintln!("Error creating buyer: {}", e);
@@ -35,7 +35,7 @@ pub async fn create_buyer(
 pub async fn buyer_purchases(path: web::Path<Uuid>, pool: web::Data<PgPool>) -> Result<HttpResponse> {
     let buyer_id = path.into_inner();
     
-    match buyer_queries::get_buyer_purchases(&pool, buyer_id).await {
+    match db::get_buyer_purchases(&pool, buyer_id).await {
         Ok(purchases) => Ok(HttpResponse::Ok().json(purchases)),
         Err(e) => {
             eprintln!("Error fetching buyer purchases: {}", e);

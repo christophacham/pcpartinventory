@@ -12,7 +12,9 @@ pub async fn get_all_pcs(pool: &PgPool) -> Result<Vec<Pc>> {
             id, pc_name, build_date, list_date, sale_date, days_listed, days_held,
             buyer_id, platform, platform_reference, intended_price, actual_sale_price,
             total_cost, profit, profit_percentage, notes,
-            status as "status: PcStatus", created_at, updated_at
+            status as "status!: PcStatus", 
+            created_at as "created_at!", 
+            updated_at as "updated_at!"
         FROM pcs 
         ORDER BY created_at DESC
         "#
@@ -31,7 +33,9 @@ pub async fn get_pc_with_components(pool: &PgPool, pc_id: Uuid) -> Result<Option
             id, pc_name, build_date, list_date, sale_date, days_listed, days_held,
             buyer_id, platform, platform_reference, intended_price, actual_sale_price,
             total_cost, profit, profit_percentage, notes,
-            status as "status: PcStatus", created_at, updated_at
+            status as "status!: PcStatus", 
+            created_at as "created_at!", 
+            updated_at as "updated_at!"
         FROM pcs 
         WHERE id = $1
         "#,
@@ -76,7 +80,9 @@ pub async fn create_pc_with_components(pool: &PgPool, request: CreatePcRequest) 
             id, pc_name, build_date, list_date, sale_date, days_listed, days_held,
             buyer_id, platform, platform_reference, intended_price, actual_sale_price,
             total_cost, profit, profit_percentage, notes,
-            status as "status: PcStatus", created_at, updated_at
+            status as "status!: PcStatus", 
+            created_at as "created_at!", 
+            updated_at as "updated_at!"
         "#,
         pc_id,
         request.pc_name,
@@ -134,7 +140,9 @@ pub async fn update_pc(pool: &PgPool, pc_id: Uuid, request: UpdatePcRequest) -> 
             id, pc_name, build_date, list_date, sale_date, days_listed, days_held,
             buyer_id, platform, platform_reference, intended_price, actual_sale_price,
             total_cost, profit, profit_percentage, notes,
-            status as "status: PcStatus", created_at, updated_at
+            status as "status!: PcStatus", 
+            created_at as "created_at!", 
+            updated_at as "updated_at!"
         "#,
         pc_id,
         request.pc_name,
@@ -167,7 +175,9 @@ pub async fn sell_pc(pool: &PgPool, pc_id: Uuid, request: SellPcRequest) -> Resu
             id, pc_name, build_date, list_date, sale_date, days_listed, days_held,
             buyer_id, platform, platform_reference, intended_price, actual_sale_price,
             total_cost, profit, profit_percentage, notes,
-            status as "status: PcStatus", created_at, updated_at
+            status as "status!: PcStatus", 
+            created_at as "created_at!", 
+            updated_at as "updated_at!"
         "#,
         pc_id,
         request.sale_date,

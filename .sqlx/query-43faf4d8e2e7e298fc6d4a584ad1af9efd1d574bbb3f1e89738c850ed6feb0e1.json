@@ -1,0 +1,50 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT \n            TO_CHAR(sale_date, 'YYYY-MM') as \"month_year!\",\n            SUM(actual_sale_price) as total_sales,\n            SUM(profit) as total_profit,\n            COUNT(*) as \"pcs_sold!\",\n            AVG(days_held::decimal) as average_days_held,\n            AVG(profit_percentage) as average_profit_margin\n        FROM pcs \n        WHERE sale_date IS NOT NULL\n        GROUP BY TO_CHAR(sale_date, 'YYYY-MM')\n        ORDER BY TO_CHAR(sale_date, 'YYYY-MM') DESC\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "month_year!",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 1,
+        "name": "total_sales",
+        "type_info": "Numeric"
+      },
+      {
+        "ordinal": 2,
+        "name": "total_profit",
+        "type_info": "Numeric"
+      },
+      {
+        "ordinal": 3,
+        "name": "pcs_sold!",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 4,
+        "name": "average_days_held",
+        "type_info": "Numeric"
+      },
+      {
+        "ordinal": 5,
+        "name": "average_profit_margin",
+        "type_info": "Numeric"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  "hash": "43faf4d8e2e7e298fc6d4a584ad1af9efd1d574bbb3f1e89738c850ed6feb0e1"
+}
