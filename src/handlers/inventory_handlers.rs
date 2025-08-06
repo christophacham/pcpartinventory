@@ -53,6 +53,26 @@ pub async fn update_part(
     }
 }
 
+pub async fn delete_part(
+    path: web::Path<Uuid>,
+    pool: web::Data<PgPool>
+) -> Result<HttpResponse> {
+    let part_id = path.into_inner();
+    
+    match db::delete_part(&pool, part_id).await {
+        Ok(true) => Ok(HttpResponse::NoContent().finish()),
+        Ok(false) => Ok(HttpResponse::NotFound().json(serde_json::json!({
+            "error": "Part not found"
+        }))),
+        Err(e) => {
+            eprintln!("Error deleting part: {}", e);
+            Ok(HttpResponse::InternalServerError().json(serde_json::json!({
+                "error": "Failed to delete part"
+            })))
+        }
+    }
+}
+
 pub async fn low_stock(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     match db::get_low_stock_parts(&pool, 5).await {
         Ok(parts) => Ok(HttpResponse::Ok().json(parts)),

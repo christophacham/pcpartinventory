@@ -86,6 +86,17 @@ pub async fn update_part(pool: &PgPool, part_id: Uuid, request: UpdateInventoryP
     Ok(part)
 }
 
+pub async fn delete_part(pool: &PgPool, part_id: Uuid) -> Result<bool> {
+    let result = sqlx::query!(
+        "DELETE FROM parts_inventory WHERE id = $1",
+        part_id
+    )
+    .execute(pool)
+    .await?;
+    
+    Ok(result.rows_affected() > 0)
+}
+
 pub async fn get_low_stock_parts(pool: &PgPool, threshold: i32) -> Result<Vec<InventoryPart>> {
     let parts = sqlx::query_as!(
         InventoryPart,

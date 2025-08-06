@@ -56,6 +56,7 @@ async fn main() -> std::io::Result<()> {
                             .route("", web::get().to(inventory_handlers::list_parts))
                             .route("", web::post().to(inventory_handlers::create_part))
                             .route("/{id}", web::put().to(inventory_handlers::update_part))
+                            .route("/{id}", web::delete().to(inventory_handlers::delete_part))
                             .route("/low-stock", web::get().to(inventory_handlers::low_stock))
                     )
                     .service(
