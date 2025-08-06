@@ -1,0 +1,34 @@
+# Development Docker Compose Override
+# Uses local builds for faster development iteration
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+version: '3.8'
+
+services:
+  backend:
+    build: 
+      context: .
+      dockerfile: Dockerfile.backend
+    environment:
+      RUST_LOG: debug
+      RUST_BACKTRACE: 1
+    volumes:
+      # Mount source code for hot reloading (if using cargo-watch)
+      - ./src:/app/src:ro
+      - ./Cargo.toml:/app/Cargo.toml:ro
+      - ./Cargo.lock:/app/Cargo.lock:ro
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    environment:
+      NODE_ENV: development
+      NEXT_PUBLIC_API_URL: http://localhost:8081
+    volumes:
+      # Mount source for hot reloading in development
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+      - ./frontend/next.config.js:/app/next.config.js:ro
+      - ./frontend/tailwind.config.js:/app/tailwind.config.js:ro
+      - ./frontend/tsconfig.json:/app/tsconfig.json:ro

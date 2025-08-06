@@ -1,0 +1,105 @@
+name: Create Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version number (e.g., v1.2.3)'
+        required: true
+        type: string
+      prerelease:
+        description: 'Is this a pre-release?'
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: read
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Validate version format
+      run: |
+        if [[ ! "${{ inputs.version }}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9]+)?$ ]]; then
+          echo "Invalid version format. Use format: v1.2.3 or v1.2.3-beta"
+          exit 1
+        fi
+
+    - name: Check if tag exists
+      run: |
+        if git tag -l | grep -q "^${{ inputs.version }}$"; then
+          echo "Tag ${{ inputs.version }} already exists"
+          exit 1
+        fi
+
+    - name: Generate changelog
+      id: changelog
+      run: |
+        # Get the last release tag
+        LAST_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+        
+        if [ -z "$LAST_TAG" ]; then
+          echo "## Changes" > changelog.md
+          echo "" >> changelog.md
+          git log --pretty=format:"- %s (%h)" --no-merges >> changelog.md
+        else
+          echo "## Changes since $LAST_TAG" > changelog.md
+          echo "" >> changelog.md
+          git log $LAST_TAG..HEAD --pretty=format:"- %s (%h)" --no-merges >> changelog.md
+        fi
+        
+        # Set output for use in release creation
+        echo "changelog<<EOF" >> $GITHUB_OUTPUT
+        cat changelog.md >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+
+    - name: Update Cargo.toml version
+      run: |
+        VERSION_NO_V=$(echo "${{ inputs.version }}" | sed 's/^v//')
+        sed -i "s/^version = \".*\"/version = \"$VERSION_NO_V\"/" Cargo.toml
+        git add Cargo.toml
+
+    - name: Update package.json version
+      run: |
+        VERSION_NO_V=$(echo "${{ inputs.version }}" | sed 's/^v//')
+        cd frontend
+        sed -i "s/\"version\": \".*\"/\"version\": \"$VERSION_NO_V\"/" package.json
+        git add package.json
+
+    - name: Commit version changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git commit -m "chore: bump version to ${{ inputs.version }}" || exit 0
+
+    - name: Create and push tag
+      run: |
+        git tag -a "${{ inputs.version }}" -m "Release ${{ inputs.version }}"
+        git push origin "${{ inputs.version }}"
+        git push origin main
+
+    - name: Create GitHub Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ inputs.version }}
+        release_name: Release ${{ inputs.version }}
+        body: ${{ steps.changelog.outputs.changelog }}
+        draft: false
+        prerelease: ${{ inputs.prerelease }}
+
+    - name: Trigger Docker build
+      run: |
+        echo "Release ${{ inputs.version }} created. Docker images will be built automatically."
+        echo "Images will be available at:"
+        echo "  - ghcr.io/${{ github.repository }}/backend:${{ inputs.version }}"
+        echo "  - ghcr.io/${{ github.repository }}/frontend:${{ inputs.version }}"

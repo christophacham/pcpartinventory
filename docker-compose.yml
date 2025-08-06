@@ -30,9 +30,7 @@ services:
       retries: 3
 
   backend:
-    build: 
-      context: .
-      dockerfile: Dockerfile.backend
+    image: ghcr.io/raul/pcpartinventory/backend:latest
     container_name: pc-inventory-backend
     environment:
       DATABASE_URL: postgresql://postgres:password@postgres:5432/pc_inventory
@@ -45,19 +43,14 @@ services:
         condition: service_healthy
 
   frontend:
-    image: node:18-alpine
+    image: ghcr.io/raul/pcpartinventory/frontend:latest
     container_name: pc-inventory-frontend
-    working_dir: /app
-    command: sh -c "npm install && npm run dev -- --hostname 0.0.0.0"
     environment:
       NEXT_PUBLIC_API_URL: http://localhost:8081
     ports:
       - "3001:3000"
     depends_on:
       - backend
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
 
   dapr-sidecar:
     image: daprio/daprd:1.12.0
